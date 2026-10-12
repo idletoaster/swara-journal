@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Swara Journal</title>
+    <meta name="apple-mobile-web-app-title" content="SwaraJournal">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+    <link rel="stylesheet" href="/css/style.css?v=12">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=12">
+    <meta name="theme-color" content="#161b22">
+    <style>
+        .trigger-item { background: rgba(46, 160, 67, 0.1); border-left: 4px solid var(--purna); padding: 8px; margin-bottom: 6px; font-size: 0.85rem; border-radius: 0 4px 4px 0; }
+        .trap-item { background: rgba(248, 81, 73, 0.1); border-left: 4px solid var(--sunya); padding: 8px; margin-bottom: 6px; font-size: 0.85rem; border-radius: 0 4px 4px 0; }
+    </style>
+</head>
+<body>
+
+    <header style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <h1 style="margin-bottom: 4px;">Swara Journal</h1>
+            <div id="userEmailDisplay" class="badge" style="font-size: 0.7rem; display: inline-block;">Loading...</div>
+        </div>
+        <div style="display:flex; gap:20px; align-items:center;">
+            <button id="themeToggleBtn" style="background:transparent; border:none; font-size:1.5rem; cursor:pointer; padding:4px;">🌙</button>
+            <button id="logoutBtn" class="btn btn-sm" style="background:var(--sunya); color:#fff; border:none; padding:6px 12px; font-weight:bold;">Logout</button>
+        </div>
+    </header>
+
+    <div class="sync-status" id="syncIndicator">Connecting...</div>
+
+    <div class="container">
+        <section id="recordTab" class="tab-page active">
+            <form id="entryForm">
+                <div class="card">
+                    <h3>1. Time & Context</h3>
+                    <label>Activity Timestamp (Override for Past Events)</label>
+                    <input type="text" id="activityTimeInput" placeholder="Select Time...">
+                    <div class="grid-2">
+                        <div>
+                            <label>Calculation Engine</label>
+                            <select id="engineSelect">
+                                <option value="swarodaya" selected>Swarodaya</option>
+                                <option value="chintamani">Chintamani</option>                                
+                            </select>
+                        </div>
+                        <div>
+                            <label>Category</label>
+                            <div style="display:flex; gap:4px;">
+                                <select id="categorySelect" style="flex:1;"></select>
+                                <button type="button" id="btnAddCategory" class="btn btn-sm" style="background:var(--purna); border:none;">+</button>
+                                <button type="button" id="btnDelCategory" class="btn btn-sm" style="background:var(--sunya); border:none;">-</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; margin-bottom: 8px;">
+                        <span style="font-size:0.8rem; color:var(--text-muted);">Location: <strong id="locDisplay" style="color:var(--ida);">Loading...</strong></span>
+                        <button type="button" id="btnGpsLocate" class="btn btn-sm">📍 Auto-Detect</button>
+                    </div>
+                    <div class="autocomplete-wrapper">
+                        <input type="text" id="locSearch" placeholder="Search City (e.g., Chennai)..." autocomplete="off" style="margin-bottom: 0;">
+                        <div id="locDropdown" class="dropdown-content"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>2. Physically Observed State</h3>
+                    <label>Observed Dominant Swara</label>
+                    <div class="segmented" id="nadiGroup">
+                        <button type="button" data-val="ida" class="active">🌙 Ida (Left)</button>
+                        <button type="button" data-val="pingala">☀️ Pingala (Right)</button>
+                    </div>
+                    <label>Observed Active Tattva</label>
+                    <select id="tattvaSelect">
+                        <option value="Earth">Earth (Prithvi)</option>
+                        <option value="Water">Water (Jala)</option>
+                        <option value="Agni">Agni (Tejas)</option>
+                        <option value="Vayu">Vayu</option>
+                        <option value="Akasha">Akasha</option>
+                    </select>
+                    <div class="grid-2">
+                        <div>
+                            <label>Travel Direction</label>
+                            <select id="travelDirSelect">
+                                <option value="N">North (N)</option>
+                                <option value="NE">Northeast (NE)</option>
+                                <option value="E">East (E)</option>
+                                <option value="SE">Southeast (SE)</option>
+                                <option value="S">South (S)</option>
+                                <option value="SW">Southwest (SW)</option>
+                                <option value="W">West (W)</option>
+                                <option value="NW">Northwest (NW)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Facing Direction</label>
+                            <select id="facingDirSelect">
+                                <option value="E">East (E)</option>
+                                <option value="N">North (N)</option>
+                                <option value="NE">Northeast (NE)</option>
+                                <option value="SE">Southeast (SE)</option>
+                                <option value="S">South (S)</option>
+                                <option value="SW">Southwest (SW)</option>
+                                <option value="W">West (W)</option>
+                                <option value="NW">Northwest (NW)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>3. Outcome & Notes</h3>
+                    <div class="segmented" id="outcomeGroup">
+                        <button type="button" data-val="pending" class="pending active">Pending</button>
+                        <button type="button" data-val="success" class="win">Success</button>
+                        <button type="button" data-val="failure" class="loss">Failure</button>
+                    </div>
+                    <textarea id="notesInput" rows="2" placeholder="Optional notes or details..."></textarea>
+                    <button type="submit" class="btn btn-primary">Save Journal Entry</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="historyTab" class="tab-page">
+            <div class="card">
+                <h3>Recorded Log History</h3>
+                <div id="historyList"></div>
+            </div>
+        </section>
+
+        <section id="analyticsTab" class="tab-page">
+            <div class="card">
+                <h3>Multivariate Pattern Recognition</h3>
+                <div class="grid-2" style="margin-bottom:12px;">
+                    <div id="adminScopeContainer" style="display:none;">
+                        <label>Scope:</label>
+                        <select id="analyticsScopeSelect" onchange="loadAnalytics()">
+                            <option value="user">My Data Only</option>
+                            <option value="all">Global</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Category Target:</label>
+                        <select id="analyticsCategorySelect" onchange="loadAnalytics()">
+                            <option value="all">All Categories</option>
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card" style="text-align:center;">
+                        <label>Targeted Logs</label>
+                        <h2 id="anaTotal" style="color:#fff;">0</h2>
+                    </div>
+                    <div class="card" style="text-align:center;">
+                        <label>Win Rate</label>
+                        <h2 id="anaWinRate" style="color:var(--text-muted);">0.0%</h2>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="color:var(--purna); border-bottom:1px solid var(--border); padding-bottom:4px; margin-bottom:8px;">✅ Top Positive Triggers</h3>
+                    <div id="triggersList">
+                        <div style="color:var(--text-muted); font-size:0.8rem;">Insufficient completed data for pattern matching.</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="color:var(--sunya); border-bottom:1px solid var(--border); padding-bottom:4px; margin-bottom:8px;">⚠️ Critical Failure Traps</h3>
+                    <div id="trapsList">
+                        <div style="color:var(--text-muted); font-size:0.8rem;">Insufficient completed data for pattern matching.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="active" data-target="recordTab"><span>✍️</span><span>Record</span></button>
+        <button data-target="historyTab"><span>📜</span><span>History</span></button>
+        <button data-target="analyticsTab"><span>📊</span><span>Analytics</span></button>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="/js/astro-engine.js?v=12"></script>
+    <script src="/js/app.js?v=12"></script>
+</body>
+</html>
